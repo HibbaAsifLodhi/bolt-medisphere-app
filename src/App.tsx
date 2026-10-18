@@ -82,6 +82,7 @@ import { SleepRecoveryView } from './views/wellness/SleepRecoveryView.tsx';
 import { LifestyleEducationView } from './views/wellness/LifestyleEducationView.tsx';
 import { INITIAL_PATIENT, INITIAL_AUDIT_LOGS } from './data/mockData.ts';
 import { AuditLogItem, PatientData } from './types/index.ts';
+import { fetchPatient, savePatient, fetchAuditLogs, addAuditLog as persistAuditLog } from './lib/supabase.ts';
 
 export default function App() {
   const [viewMode, setViewMode] = useState<'app' | 'landing'>('app');
@@ -89,8 +90,27 @@ export default function App() {
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState<boolean>(false);
   const [patient, setPatient] = useState<PatientData>(INITIAL_PATIENT);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
+  const [dataReady, setDataReady] = useState<boolean>(false);
   const [selectedVertebra, setSelectedVertebra] = useState<string>('L4');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Load patient + audit logs from the database on first render
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [remotePatient, remoteLogs] = await Promise.all([fetchPatient(), fetchAuditLogs()]);
+        if (cancelled) return;
+        if (remotePatient) setPatient(remotePatient);
+        if (remoteLogs.length > 0) setAuditLogs(remoteLogs);
+      } catch (err) {
+        console.error('Failed to load data from database', err);
+      } finally {
+        if (!cancelled) setDataReady(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   // Check URL parameters for initial view or route
   useEffect(() => {
@@ -114,19 +134,20 @@ export default function App() {
 
   const handleUpdatePatient = (updated: Partial<PatientData>) => {
     setPatient(prev => ({ ...prev, ...updated }));
+    savePatient(updated).catch(err => console.error('Failed to save patient record', err));
     showToast('Patient record updated');
   };
 
   const handleAddAuditLog = (event: string, user: string, reason: string) => {
-    const newLog: AuditLogItem = {
-      id: `log-${Date.now()}`,
-      time: new Date().toLocaleString('en-US', { timeZoneName: 'short' }),
-      event,
-      user,
-      reason
-    };
-    setAuditLogs(prev => [newLog, ...prev]);
-    showToast(`Audit Log Recorded: ${event}`);
+    persistAuditLog(event, user, reason)
+      .then(savedLog => {
+        setAuditLogs(prev => [savedLog, ...prev]);
+        showToast(`Audit Log Recorded: ${savedLog.event}`);
+      })
+      .catch(err => {
+        console.error('Failed to record audit log', err);
+        showToast('Could not record audit log');
+      });
   };
 
   const handleNavigate = (route: string) => {
