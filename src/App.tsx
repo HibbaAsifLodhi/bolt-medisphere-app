@@ -73,6 +73,8 @@ import { AccessibilitySettingsView } from './views/system/AccessibilitySettingsV
 import { DataExportView } from './views/system/DataExportView.tsx';
 // Wellness group
 import { MealPlansView } from './views/wellness/MealPlansView.tsx';
+import { NutritionDashboardView } from './views/wellness/NutritionDashboardView.tsx';
+import { ServiceDirectoryView } from './views/ecosystem/ServiceDirectoryView.tsx';
 import { CalorieTrackingView } from './views/wellness/CalorieTrackingView.tsx';
 import { HydrationTrackerView } from './views/wellness/HydrationTrackerView.tsx';
 import { ActivityStepsView } from './views/wellness/ActivityStepsView.tsx';
@@ -309,22 +311,22 @@ export default function App() {
         );
       // === Account group ===
       case 'account-settings':
-        return <AccountSettingsView />;
+        return <AccountSettingsView patient={patient} onUpdatePatient={handleUpdatePatient} />;
       case 'privacy-security':
-        return <PrivacySecurityView />;
+        return <PrivacySecurityView patient={patient} />;
       case 'consent-permissions':
-        return <ConsentPermissionsView />;
+        return <ConsentPermissionsView patient={patient} onAddAuditLog={handleAddAuditLog} />;
       case 'notifications-reminders':
-        return <NotificationsRemindersView />;
+        return <NotificationsRemindersView patient={patient} />;
       case 'help-centre':
         return <HelpCentreView />;
       case 'family-profiles':
-        return <FamilyProfilesView />;
+        return <FamilyProfilesView currentPatient={patient} onNavigate={handleNavigate} />;
       // === AI group ===
       case 'ai-report-explainer':
         return <AiReportExplainerView />;
       case 'ai-medication-info':
-        return <AiMedicationInfoView />;
+        return <AiMedicationInfoView patient={patient} />;
       case 'ai-physio-guide':
         return <AiPhysioGuideView />;
       case 'ai-appointment-prep':
@@ -333,24 +335,24 @@ export default function App() {
         return <AiHealthEducationView />;
       // === Ecosystem group ===
       case 'provider-portal':
-        return <ProviderPortalView />;
+        return <ProviderPortalView patient={patient} onAddAuditLog={handleAddAuditLog} />;
       case 'healthcare-service-directory':
-        return <UniversalSubpageView routeId={currentRoute} patient={patient} onNavigate={handleNavigate} onAddAuditLog={addAuditLog} />;
+        return <ServiceDirectoryView />;
       case 'professional-profile':
         return <ProfessionalProfileView />;
       case 'patient-feedback':
         return <PatientFeedbackView />;
       case 'referral-coordination':
-        return <ReferralCoordinationView />;
+        return <ReferralCoordinationView patient={patient} />;
       case 'remote-rehab':
         return <RemoteRehabView />;
       case 'resource-equipment':
         return <ResourceEquipmentView />;
       // === Emergency group ===
       case 'allergies-contraindications':
-        return <AllergiesContraindicationsView />;
+        return <AllergiesContraindicationsView patient={patient} />;
       case 'previous-medications':
-        return <PreviousMedicationsView />;
+        return <PreviousMedicationsView patient={patient} />;
       // === Physio group ===
       case 'rom-strength':
         return <RomStrengthView />;
@@ -374,16 +376,16 @@ export default function App() {
         return <TherapistFeedbackView />;
       // === Records group ===
       case 'teleconsultation':
-        return <TeleconsultationView />;
+        return <TeleconsultationView patient={patient} />;
       case 'home-healthcare':
-        return <HomeHealthcareView />;
+        return <HomeHealthcareView patient={patient} />;
       case 'medical-uploads':
-        return <MedicalUploadsView />;
+        return <MedicalUploadsView patient={patient} />;
       case 'patient-reports-summaries':
       case 'diagnoses-notes':
-        return <PatientReportsSummariesView />;
+        return <PatientReportsSummariesView patient={patient} />;
       case 'treatment-plans':
-        return <TreatmentPlansView />;
+        return <TreatmentPlansView patient={patient} />;
       // === System group ===
       case 'research-clinical-ed':
         return <ResearchClinicalEdView />;
@@ -394,10 +396,10 @@ export default function App() {
       case 'accessibility-settings':
         return <AccessibilitySettingsView />;
       case 'data-export':
-        return <DataExportView />;
+        return <DataExportView patient={patient} />;
       // === Wellness group ===
       case 'nutrition-dashboard':
-        return <UniversalSubpageView routeId={currentRoute} patient={patient} onNavigate={handleNavigate} onAddAuditLog={addAuditLog} />;
+        return <NutritionDashboardView />;
       case 'meal-plans':
         return <MealPlansView />;
       case 'calorie-tracking':
