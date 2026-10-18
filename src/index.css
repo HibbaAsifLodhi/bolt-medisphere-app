@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .font-urdu {
+    font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Segoe UI', Tahoma, Geneva, sans-serif;
+  }
+}
+
+/* Custom brand theme tokens */
+:root {
+  --brand-navy: #0b192c;
+  --brand-navyLight: #1e3e62;
+  --brand-primary: #00796b;
+  --brand-accent: #ff6500;
+}
+
+.bg-brand-navy {
+  background-color: #0b192c;
+}
+.bg-brand-navyLight {
+  background-color: #1e3e62;
+}
+.bg-brand-600 {
+  background-color: #0d9488;
+}
+.bg-brand-700 {
+  background-color: #0f766e;
+}
+.text-brand-600 {
+  color: #0d9488;
+}
+.text-brand-700 {
+  color: #0f766e;
+}
+.text-brand-800 {
+  color: #115e59;
+}
+.border-brand-500 {
+  border-color: #14b8a6;
+}
+.border-brand-600 {
+  border-color: #0d9488;
+}
+
+/* Active navigation state */
+.nav-active {
+  background-color: #1e3e62 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-left: 3px solid #14b8a6;
+}
+
+/* Print handling for Emergency Medical Card */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-emergency-card, #printable-emergency-card * {
+    visibility: visible;
+  }
+  #printable-emergency-card {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0;
+    padding: 20px;
+    background: white;
+    color: black;
+    display: block !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
