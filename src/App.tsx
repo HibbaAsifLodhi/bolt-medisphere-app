@@ -1,88 +1,100 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { Header } from './components/Header.tsx';
 import { Sidebar } from './components/Sidebar.tsx';
 import { PrintableEmergencyCard } from './components/PrintableEmergencyCard.tsx';
 import { LandingPage } from './components/LandingPage.tsx';
+import { LazyRoute } from './components/LazyRoute.tsx';
 import { HomeDashboard } from './views/HomeDashboard.tsx';
-import { EmergencySosView } from './views/EmergencySosView.tsx';
-import { EmergencyFileView } from './views/EmergencyFileView.tsx';
-import { EmergencyAuditView } from './views/EmergencyAuditView.tsx';
-import { SpinalImagingView } from './views/SpinalImagingView.tsx';
-import { PhysioDashboardView } from './views/PhysioDashboardView.tsx';
-import { AiAssistantView } from './views/AiAssistantView.tsx';
-import { UrduHubView } from './views/UrduHubView.tsx';
-import { SdgImpactView } from './views/SdgImpactView.tsx';
-import { PatientProfileView } from './views/PatientProfileView.tsx';
-import { MedicalHistoryView } from './views/MedicalHistoryView.tsx';
-import { PrescriptionsView } from './views/PrescriptionsView.tsx';
-import { LabReportsView } from './views/LabReportsView.tsx';
-import { MriCtViewerView } from './views/MriCtViewerView.tsx';
-import { AppointmentsView } from './views/AppointmentsView.tsx';
-import { DirectoryView } from './views/DirectoryView.tsx';
-import { ExerciseLibraryView } from './views/ExerciseLibraryView.tsx';
-import { VitalsTrackerView } from './views/VitalsTrackerView.tsx';
-import { SystemStatusView } from './views/SystemStatusView.tsx';
-import { ProductRoadmapView } from './views/ProductRoadmapView.tsx';
-import { UniversalSubpageView } from './views/UniversalSubpageView.tsx';
-// Account group
-import { AccountSettingsView } from './views/account/AccountSettingsView.tsx';
-import { PrivacySecurityView } from './views/account/PrivacySecurityView.tsx';
-import { ConsentPermissionsView } from './views/account/ConsentPermissionsView.tsx';
-import { NotificationsRemindersView } from './views/account/NotificationsRemindersView.tsx';
-import { HelpCentreView } from './views/account/HelpCentreView.tsx';
-import { FamilyProfilesView } from './views/account/FamilyProfilesView.tsx';
-// AI group
-import { AiReportExplainerView } from './views/ai/AiReportExplainerView.tsx';
-import { AiMedicationInfoView } from './views/ai/AiMedicationInfoView.tsx';
-import { AiPhysioGuideView } from './views/ai/AiPhysioGuideView.tsx';
-import { AiAppointmentPrepView } from './views/ai/AiAppointmentPrepView.tsx';
-import { AiHealthEducationView } from './views/ai/AiHealthEducationView.tsx';
-// Ecosystem group
-import { ProviderPortalView } from './views/ecosystem/ProviderPortalView.tsx';
-// import { ServiceDirectoryView } from './views/ecosystem/ServiceDirectoryView.tsx';
-import { ProfessionalProfileView } from './views/ecosystem/ProfessionalProfileView.tsx';
-import { PatientFeedbackView } from './views/ecosystem/PatientFeedbackView.tsx';
-import { ReferralCoordinationView } from './views/ecosystem/ReferralCoordinationView.tsx';
-import { RemoteRehabView } from './views/ecosystem/RemoteRehabView.tsx';
-import { ResourceEquipmentView } from './views/ecosystem/ResourceEquipmentView.tsx';
-// Emergency group
-import { AllergiesContraindicationsView } from './views/emergency/AllergiesContraindicationsView.tsx';
-import { PreviousMedicationsView } from './views/emergency/PreviousMedicationsView.tsx';
-// Physio group
-import { RomStrengthView } from './views/physio/RomStrengthView.tsx';
-import { PainFunctionalView } from './views/physio/PainFunctionalView.tsx';
-import { RehabPlansView } from './views/physio/RehabPlansView.tsx';
-import { GaitPostureView } from './views/physio/GaitPostureView.tsx';
-import { RehabPrecautionsView } from './views/physio/RehabPrecautionsView.tsx';
-import { ExerciseDemosView } from './views/physio/ExerciseDemosView.tsx';
-import { ExerciseTrackerView } from './views/physio/ExerciseTrackerView.tsx';
-import { RehabChartsView } from './views/physio/RehabChartsView.tsx';
-import { HomeExerciseProgView } from './views/physio/HomeExerciseProgView.tsx';
-import { TherapistFeedbackView } from './views/physio/TherapistFeedbackView.tsx';
-// Records group
-import { TeleconsultationView } from './views/records/TeleconsultationView.tsx';
-import { HomeHealthcareView } from './views/records/HomeHealthcareView.tsx';
-import { MedicalUploadsView } from './views/records/MedicalUploadsView.tsx';
-import { PatientReportsSummariesView } from './views/records/PatientReportsSummariesView.tsx';
-import { TreatmentPlansView } from './views/records/TreatmentPlansView.tsx';
-// System group
-import { ResearchClinicalEdView } from './views/system/ResearchClinicalEdView.tsx';
-import { HealthAwarenessView } from './views/system/HealthAwarenessView.tsx';
-import { CommunityProgramsView } from './views/system/CommunityProgramsView.tsx';
-import { AccessibilitySettingsView } from './views/system/AccessibilitySettingsView.tsx';
-import { DataExportView } from './views/system/DataExportView.tsx';
-// Wellness group
-import { MealPlansView } from './views/wellness/MealPlansView.tsx';
-import { NutritionDashboardView } from './views/wellness/NutritionDashboardView.tsx';
-import { ServiceDirectoryView } from './views/ecosystem/ServiceDirectoryView.tsx';
-import { CalorieTrackingView } from './views/wellness/CalorieTrackingView.tsx';
-import { HydrationTrackerView } from './views/wellness/HydrationTrackerView.tsx';
-import { ActivityStepsView } from './views/wellness/ActivityStepsView.tsx';
-import { SleepRecoveryView } from './views/wellness/SleepRecoveryView.tsx';
-import { LifestyleEducationView } from './views/wellness/LifestyleEducationView.tsx';
 import { INITIAL_PATIENT, INITIAL_AUDIT_LOGS } from './data/mockData.ts';
 import { AuditLogItem, PatientData } from './types/index.ts';
 import { fetchPatient, savePatient, fetchAuditLogs, addAuditLog as persistAuditLog } from './lib/supabase.ts';
+
+type Loader = () => Promise<{ default: React.ComponentType<any> }>;
+
+// Views use named exports; wrap each dynamic import to surface its named export
+// as the default that React.lazy expects.
+function named(name: string, loader: () => Promise<Record<string, unknown>>): Loader {
+  return () =>
+    loader().then(m => ({ default: (m[name] ?? m.default) as React.ComponentType<any> }));
+}
+
+const loaders = {
+  EmergencySosView: named('EmergencySosView', () => import('./views/EmergencySosView.tsx')),
+  EmergencyFileView: named('EmergencyFileView', () => import('./views/EmergencyFileView.tsx')),
+  EmergencyAuditView: named('EmergencyAuditView', () => import('./views/EmergencyAuditView.tsx')),
+  SpinalImagingView: named('SpinalImagingView', () => import('./views/SpinalImagingView.tsx')),
+  PhysioDashboardView: named('PhysioDashboardView', () => import('./views/PhysioDashboardView.tsx')),
+  AiAssistantView: named('AiAssistantView', () => import('./views/AiAssistantView.tsx')),
+  UrduHubView: named('UrduHubView', () => import('./views/UrduHubView.tsx')),
+  SdgImpactView: named('SdgImpactView', () => import('./views/SdgImpactView.tsx')),
+  PatientProfileView: named('PatientProfileView', () => import('./views/PatientProfileView.tsx')),
+  MedicalHistoryView: named('MedicalHistoryView', () => import('./views/MedicalHistoryView.tsx')),
+  PrescriptionsView: named('PrescriptionsView', () => import('./views/PrescriptionsView.tsx')),
+  LabReportsView: named('LabReportsView', () => import('./views/LabReportsView.tsx')),
+  MriCtViewerView: named('MriCtViewerView', () => import('./views/MriCtViewerView.tsx')),
+  AppointmentsView: named('AppointmentsView', () => import('./views/AppointmentsView.tsx')),
+  DirectoryView: named('DirectoryView', () => import('./views/DirectoryView.tsx')),
+  ExerciseLibraryView: named('ExerciseLibraryView', () => import('./views/ExerciseLibraryView.tsx')),
+  VitalsTrackerView: named('VitalsTrackerView', () => import('./views/VitalsTrackerView.tsx')),
+  SystemStatusView: named('SystemStatusView', () => import('./views/SystemStatusView.tsx')),
+  ProductRoadmapView: named('ProductRoadmapView', () => import('./views/ProductRoadmapView.tsx')),
+  UniversalSubpageView: named('UniversalSubpageView', () => import('./views/UniversalSubpageView.tsx')),
+  // Account group
+  AccountSettingsView: named('AccountSettingsView', () => import('./views/account/AccountSettingsView.tsx')),
+  PrivacySecurityView: named('PrivacySecurityView', () => import('./views/account/PrivacySecurityView.tsx')),
+  ConsentPermissionsView: named('ConsentPermissionsView', () => import('./views/account/ConsentPermissionsView.tsx')),
+  NotificationsRemindersView: named('NotificationsRemindersView', () => import('./views/account/NotificationsRemindersView.tsx')),
+  HelpCentreView: named('HelpCentreView', () => import('./views/account/HelpCentreView.tsx')),
+  FamilyProfilesView: named('FamilyProfilesView', () => import('./views/account/FamilyProfilesView.tsx')),
+  // AI group
+  AiReportExplainerView: named('AiReportExplainerView', () => import('./views/ai/AiReportExplainerView.tsx')),
+  AiMedicationInfoView: named('AiMedicationInfoView', () => import('./views/ai/AiMedicationInfoView.tsx')),
+  AiPhysioGuideView: named('AiPhysioGuideView', () => import('./views/ai/AiPhysioGuideView.tsx')),
+  AiAppointmentPrepView: named('AiAppointmentPrepView', () => import('./views/ai/AiAppointmentPrepView.tsx')),
+  AiHealthEducationView: named('AiHealthEducationView', () => import('./views/ai/AiHealthEducationView.tsx')),
+  // Ecosystem group
+  ProviderPortalView: named('ProviderPortalView', () => import('./views/ecosystem/ProviderPortalView.tsx')),
+  ServiceDirectoryView: named('ServiceDirectoryView', () => import('./views/ecosystem/ServiceDirectoryView.tsx')),
+  ProfessionalProfileView: named('ProfessionalProfileView', () => import('./views/ecosystem/ProfessionalProfileView.tsx')),
+  PatientFeedbackView: named('PatientFeedbackView', () => import('./views/ecosystem/PatientFeedbackView.tsx')),
+  ReferralCoordinationView: named('ReferralCoordinationView', () => import('./views/ecosystem/ReferralCoordinationView.tsx')),
+  RemoteRehabView: named('RemoteRehabView', () => import('./views/ecosystem/RemoteRehabView.tsx')),
+  ResourceEquipmentView: named('ResourceEquipmentView', () => import('./views/ecosystem/ResourceEquipmentView.tsx')),
+  // Emergency group
+  AllergiesContraindicationsView: named('AllergiesContraindicationsView', () => import('./views/emergency/AllergiesContraindicationsView.tsx')),
+  PreviousMedicationsView: named('PreviousMedicationsView', () => import('./views/emergency/PreviousMedicationsView.tsx')),
+  // Physio group
+  RomStrengthView: named('RomStrengthView', () => import('./views/physio/RomStrengthView.tsx')),
+  PainFunctionalView: named('PainFunctionalView', () => import('./views/physio/PainFunctionalView.tsx')),
+  RehabPlansView: named('RehabPlansView', () => import('./views/physio/RehabPlansView.tsx')),
+  GaitPostureView: named('GaitPostureView', () => import('./views/physio/GaitPostureView.tsx')),
+  RehabPrecautionsView: named('RehabPrecautionsView', () => import('./views/physio/RehabPrecautionsView.tsx')),
+  ExerciseDemosView: named('ExerciseDemosView', () => import('./views/physio/ExerciseDemosView.tsx')),
+  ExerciseTrackerView: named('ExerciseTrackerView', () => import('./views/physio/ExerciseTrackerView.tsx')),
+  RehabChartsView: named('RehabChartsView', () => import('./views/physio/RehabChartsView.tsx')),
+  HomeExerciseProgView: named('HomeExerciseProgView', () => import('./views/physio/HomeExerciseProgView.tsx')),
+  TherapistFeedbackView: named('TherapistFeedbackView', () => import('./views/physio/TherapistFeedbackView.tsx')),
+  // Records group
+  TeleconsultationView: named('TeleconsultationView', () => import('./views/records/TeleconsultationView.tsx')),
+  HomeHealthcareView: named('HomeHealthcareView', () => import('./views/records/HomeHealthcareView.tsx')),
+  MedicalUploadsView: named('MedicalUploadsView', () => import('./views/records/MedicalUploadsView.tsx')),
+  PatientReportsSummariesView: named('PatientReportsSummariesView', () => import('./views/records/PatientReportsSummariesView.tsx')),
+  TreatmentPlansView: named('TreatmentPlansView', () => import('./views/records/TreatmentPlansView.tsx')),
+  // System group
+  ResearchClinicalEdView: named('ResearchClinicalEdView', () => import('./views/system/ResearchClinicalEdView.tsx')),
+  HealthAwarenessView: named('HealthAwarenessView', () => import('./views/system/HealthAwarenessView.tsx')),
+  CommunityProgramsView: named('CommunityProgramsView', () => import('./views/system/CommunityProgramsView.tsx')),
+  AccessibilitySettingsView: named('AccessibilitySettingsView', () => import('./views/system/AccessibilitySettingsView.tsx')),
+  DataExportView: named('DataExportView', () => import('./views/system/DataExportView.tsx')),
+  // Wellness group
+  NutritionDashboardView: named('NutritionDashboardView', () => import('./views/wellness/NutritionDashboardView.tsx')),
+  MealPlansView: named('MealPlansView', () => import('./views/wellness/MealPlansView.tsx')),
+  CalorieTrackingView: named('CalorieTrackingView', () => import('./views/wellness/CalorieTrackingView.tsx')),
+  HydrationTrackerView: named('HydrationTrackerView', () => import('./views/wellness/HydrationTrackerView.tsx')),
+  ActivityStepsView: named('ActivityStepsView', () => import('./views/wellness/ActivityStepsView.tsx')),
+  SleepRecoveryView: named('SleepRecoveryView', () => import('./views/wellness/SleepRecoveryView.tsx')),
+  LifestyleEducationView: named('LifestyleEducationView', () => import('./views/wellness/LifestyleEducationView.tsx')),
+} as const;
 
 export default function App() {
   const [viewMode, setViewMode] = useState<'app' | 'landing'>('app');
@@ -90,7 +102,6 @@ export default function App() {
   const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState<boolean>(false);
   const [patient, setPatient] = useState<PatientData>(INITIAL_PATIENT);
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
-  const [dataReady, setDataReady] = useState<boolean>(false);
   const [selectedVertebra, setSelectedVertebra] = useState<string>('L4');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -105,8 +116,6 @@ export default function App() {
         if (remoteLogs.length > 0) setAuditLogs(remoteLogs);
       } catch (err) {
         console.error('Failed to load data from database', err);
-      } finally {
-        if (!cancelled) setDataReady(true);
       }
     })();
     return () => { cancelled = true; };
@@ -177,7 +186,8 @@ export default function App() {
         );
       case 'patient-profile':
         return (
-          <PatientProfileView
+          <LazyRoute
+            loader={loaders.PatientProfileView}
             patient={patient}
             onUpdatePatient={handleUpdatePatient}
             onPrintCard={handlePrintCard}
@@ -186,7 +196,8 @@ export default function App() {
         );
       case 'complete-medical-history':
         return (
-          <MedicalHistoryView
+          <LazyRoute
+            loader={loaders.MedicalHistoryView}
             patient={patient}
             onNavigate={handleNavigate}
           />
@@ -194,77 +205,43 @@ export default function App() {
       case 'prescriptions-records':
       case 'current-medications':
         return (
-          <PrescriptionsView
+          <LazyRoute
+            loader={loaders.PrescriptionsView}
             patient={patient}
             onAddAuditLog={handleAddAuditLog}
           />
         );
       case 'lab-reports':
-        return (
-          <LabReportsView
-            patient={patient}
-          />
-        );
+        return <LazyRoute loader={loaders.LabReportsView} patient={patient} />;
       case 'mri-ct-viewer':
-        return (
-          <MriCtViewerView
-            patient={patient}
-          />
-        );
+        return <LazyRoute loader={loaders.MriCtViewerView} patient={patient} />;
       case 'vitals-height-weight':
       case 'bp-glucose':
       case 'heart-rate-spo2':
-        return (
-          <VitalsTrackerView
-            patient={patient}
-          />
-        );
+        return <LazyRoute loader={loaders.VitalsTrackerView} patient={patient} />;
       case 'appointments-history':
         return (
-          <AppointmentsView
+          <LazyRoute
+            loader={loaders.AppointmentsView}
             patient={patient}
             onAddAuditLog={handleAddAuditLog}
             onNavigate={handleNavigate}
           />
         );
       case 'doctors-directory':
-        return (
-          <DirectoryView
-            type="doctors"
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.DirectoryView} type="doctors" onNavigate={handleNavigate} />;
       case 'physio-directory':
-        return (
-          <DirectoryView
-            type="physios"
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.DirectoryView} type="physios" onNavigate={handleNavigate} />;
       case 'hospitals-directory':
-        return (
-          <DirectoryView
-            type="hospitals"
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.DirectoryView} type="hospitals" onNavigate={handleNavigate} />;
       case 'laboratories-directory':
-        return (
-          <DirectoryView
-            type="labs"
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.DirectoryView} type="labs" onNavigate={handleNavigate} />;
       case 'pharmacy-info':
-        return (
-          <DirectoryView
-            type="pharmacies"
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.DirectoryView} type="pharmacies" onNavigate={handleNavigate} />;
       case 'emergency-sos':
         return (
-          <EmergencySosView
+          <LazyRoute
+            loader={loaders.EmergencySosView}
             patient={patient}
             onNavigate={handleNavigate}
             onAddAuditLog={handleAddAuditLog}
@@ -273,169 +250,175 @@ export default function App() {
         );
       case 'emergency-file':
         return (
-          <EmergencyFileView
+          <LazyRoute
+            loader={loaders.EmergencyFileView}
             patient={patient}
             onPrintCard={handlePrintCard}
           />
         );
       case 'emergency-audit':
         return (
-          <EmergencyAuditView
+          <LazyRoute
+            loader={loaders.EmergencyAuditView}
             auditLogs={auditLogs}
             onAddAuditLog={handleAddAuditLog}
           />
         );
       case 'xray-imaging':
         return (
-          <SpinalImagingView
+          <LazyRoute
+            loader={loaders.SpinalImagingView}
             selectedVertebra={selectedVertebra}
             onSelectVertebra={setSelectedVertebra}
             onNavigate={handleNavigate}
           />
         );
       case 'physio-dashboard':
-        return (
-          <PhysioDashboardView
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.PhysioDashboardView} onNavigate={handleNavigate} />;
       case 'exercise-library':
-        return (
-          <ExerciseLibraryView
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.ExerciseLibraryView} onNavigate={handleNavigate} />;
       case 'ai-assistant':
-        return (
-          <AiAssistantView
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.AiAssistantView} onNavigate={handleNavigate} />;
       case 'multilingual-urdu':
-        return (
-          <UrduHubView
-            onNavigate={handleNavigate}
-          />
-        );
+        return <LazyRoute loader={loaders.UrduHubView} onNavigate={handleNavigate} />;
       case 'system-status':
-        return (
-          <SystemStatusView />
-        );
+        return <LazyRoute loader={loaders.SystemStatusView} />;
       case 'product-roadmap':
-        return (
-          <ProductRoadmapView />
-        );
+        return <LazyRoute loader={loaders.ProductRoadmapView} />;
       case 'sdg-impact':
       case 'sdg-reports':
-        return (
-          <SdgImpactView />
-        );
+        return <LazyRoute loader={loaders.SdgImpactView} />;
       // === Account group ===
       case 'account-settings':
-        return <AccountSettingsView patient={patient} onUpdatePatient={handleUpdatePatient} />;
+        return (
+          <LazyRoute
+            loader={loaders.AccountSettingsView}
+            patient={patient}
+            onUpdatePatient={handleUpdatePatient}
+          />
+        );
       case 'privacy-security':
-        return <PrivacySecurityView patient={patient} />;
+        return <LazyRoute loader={loaders.PrivacySecurityView} patient={patient} />;
       case 'consent-permissions':
-        return <ConsentPermissionsView patient={patient} onAddAuditLog={handleAddAuditLog} />;
+        return (
+          <LazyRoute
+            loader={loaders.ConsentPermissionsView}
+            patient={patient}
+            onAddAuditLog={handleAddAuditLog}
+          />
+        );
       case 'notifications-reminders':
-        return <NotificationsRemindersView patient={patient} />;
+        return <LazyRoute loader={loaders.NotificationsRemindersView} patient={patient} />;
       case 'help-centre':
-        return <HelpCentreView />;
+        return <LazyRoute loader={loaders.HelpCentreView} />;
       case 'family-profiles':
-        return <FamilyProfilesView currentPatient={patient} onNavigate={handleNavigate} />;
+        return (
+          <LazyRoute
+            loader={loaders.FamilyProfilesView}
+            currentPatient={patient}
+            onNavigate={handleNavigate}
+          />
+        );
       // === AI group ===
       case 'ai-report-explainer':
-        return <AiReportExplainerView />;
+        return <LazyRoute loader={loaders.AiReportExplainerView} />;
       case 'ai-medication-info':
-        return <AiMedicationInfoView patient={patient} />;
+        return <LazyRoute loader={loaders.AiMedicationInfoView} patient={patient} />;
       case 'ai-physio-guide':
-        return <AiPhysioGuideView />;
+        return <LazyRoute loader={loaders.AiPhysioGuideView} />;
       case 'ai-appointment-prep':
-        return <AiAppointmentPrepView />;
+        return <LazyRoute loader={loaders.AiAppointmentPrepView} />;
       case 'ai-health-education':
-        return <AiHealthEducationView />;
+        return <LazyRoute loader={loaders.AiHealthEducationView} />;
       // === Ecosystem group ===
       case 'provider-portal':
-        return <ProviderPortalView patient={patient} onAddAuditLog={handleAddAuditLog} />;
+        return (
+          <LazyRoute
+            loader={loaders.ProviderPortalView}
+            patient={patient}
+            onAddAuditLog={handleAddAuditLog}
+          />
+        );
       case 'healthcare-service-directory':
-        return <ServiceDirectoryView />;
+        return <LazyRoute loader={loaders.ServiceDirectoryView} />;
       case 'professional-profile':
-        return <ProfessionalProfileView />;
+        return <LazyRoute loader={loaders.ProfessionalProfileView} />;
       case 'patient-feedback':
-        return <PatientFeedbackView />;
+        return <LazyRoute loader={loaders.PatientFeedbackView} />;
       case 'referral-coordination':
-        return <ReferralCoordinationView patient={patient} />;
+        return <LazyRoute loader={loaders.ReferralCoordinationView} patient={patient} />;
       case 'remote-rehab':
-        return <RemoteRehabView />;
+        return <LazyRoute loader={loaders.RemoteRehabView} />;
       case 'resource-equipment':
-        return <ResourceEquipmentView />;
+        return <LazyRoute loader={loaders.ResourceEquipmentView} />;
       // === Emergency group ===
       case 'allergies-contraindications':
-        return <AllergiesContraindicationsView patient={patient} />;
+        return <LazyRoute loader={loaders.AllergiesContraindicationsView} patient={patient} />;
       case 'previous-medications':
-        return <PreviousMedicationsView patient={patient} />;
+        return <LazyRoute loader={loaders.PreviousMedicationsView} patient={patient} />;
       // === Physio group ===
       case 'rom-strength':
-        return <RomStrengthView />;
+        return <LazyRoute loader={loaders.RomStrengthView} />;
       case 'pain-functional':
-        return <PainFunctionalView />;
+        return <LazyRoute loader={loaders.PainFunctionalView} />;
       case 'rehab-plans':
-        return <RehabPlansView />;
+        return <LazyRoute loader={loaders.RehabPlansView} />;
       case 'gait-posture':
-        return <GaitPostureView />;
+        return <LazyRoute loader={loaders.GaitPostureView} />;
       case 'rehab-precautions':
-        return <RehabPrecautionsView />;
+        return <LazyRoute loader={loaders.RehabPrecautionsView} />;
       case 'exercise-demos':
-        return <ExerciseDemosView />;
+        return <LazyRoute loader={loaders.ExerciseDemosView} />;
       case 'exercise-tracker':
-        return <ExerciseTrackerView />;
+        return <LazyRoute loader={loaders.ExerciseTrackerView} />;
       case 'rehab-charts':
-        return <RehabChartsView />;
+        return <LazyRoute loader={loaders.RehabChartsView} />;
       case 'home-exercise-prog':
-        return <HomeExerciseProgView />;
+        return <LazyRoute loader={loaders.HomeExerciseProgView} />;
       case 'therapist-feedback':
-        return <TherapistFeedbackView />;
+        return <LazyRoute loader={loaders.TherapistFeedbackView} />;
       // === Records group ===
       case 'teleconsultation':
-        return <TeleconsultationView patient={patient} />;
+        return <LazyRoute loader={loaders.TeleconsultationView} patient={patient} />;
       case 'home-healthcare':
-        return <HomeHealthcareView patient={patient} />;
+        return <LazyRoute loader={loaders.HomeHealthcareView} patient={patient} />;
       case 'medical-uploads':
-        return <MedicalUploadsView patient={patient} />;
+        return <LazyRoute loader={loaders.MedicalUploadsView} patient={patient} />;
       case 'patient-reports-summaries':
       case 'diagnoses-notes':
-        return <PatientReportsSummariesView patient={patient} />;
+        return <LazyRoute loader={loaders.PatientReportsSummariesView} patient={patient} />;
       case 'treatment-plans':
-        return <TreatmentPlansView patient={patient} />;
+        return <LazyRoute loader={loaders.TreatmentPlansView} patient={patient} />;
       // === System group ===
       case 'research-clinical-ed':
-        return <ResearchClinicalEdView />;
+        return <LazyRoute loader={loaders.ResearchClinicalEdView} />;
       case 'health-awareness':
-        return <HealthAwarenessView />;
+        return <LazyRoute loader={loaders.HealthAwarenessView} />;
       case 'community-programs':
-        return <CommunityProgramsView />;
+        return <LazyRoute loader={loaders.CommunityProgramsView} />;
       case 'accessibility-settings':
-        return <AccessibilitySettingsView />;
+        return <LazyRoute loader={loaders.AccessibilitySettingsView} />;
       case 'data-export':
-        return <DataExportView patient={patient} />;
+        return <LazyRoute loader={loaders.DataExportView} patient={patient} />;
       // === Wellness group ===
       case 'nutrition-dashboard':
-        return <NutritionDashboardView />;
+        return <LazyRoute loader={loaders.NutritionDashboardView} />;
       case 'meal-plans':
-        return <MealPlansView />;
+        return <LazyRoute loader={loaders.MealPlansView} />;
       case 'calorie-tracking':
-        return <CalorieTrackingView />;
+        return <LazyRoute loader={loaders.CalorieTrackingView} />;
       case 'hydration-tracker':
-        return <HydrationTrackerView />;
+        return <LazyRoute loader={loaders.HydrationTrackerView} />;
       case 'activity-steps':
-        return <ActivityStepsView />;
+        return <LazyRoute loader={loaders.ActivityStepsView} />;
       case 'sleep-recovery':
-        return <SleepRecoveryView />;
+        return <LazyRoute loader={loaders.SleepRecoveryView} />;
       case 'lifestyle-education':
-        return <LifestyleEducationView />;
+        return <LazyRoute loader={loaders.LifestyleEducationView} />;
       default:
         return (
-          <UniversalSubpageView
+          <LazyRoute
+            loader={loaders.UniversalSubpageView}
             routeId={currentRoute}
             patient={patient}
             onNavigate={handleNavigate}
@@ -457,12 +440,18 @@ export default function App() {
 
       {/* 1. Public Portal View */}
       {viewMode === 'landing' ? (
-        <LandingPage
-          onLaunchPlatform={(initialRoute) => {
+        <Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center bg-slate-950">
+              <div className="w-8 h-8 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
+            </div>
+          }
+        >
+          <LandingLazy onLaunchPlatform={(initialRoute: string | undefined) => {
             if (initialRoute) setCurrentRoute(initialRoute);
             setViewMode('app');
-          }}
-        />
+          }} />
+        </Suspense>
       ) : (
         /* 2. Platform OS View */
         <div id="appView" className="flex h-screen overflow-hidden">
@@ -501,3 +490,7 @@ export default function App() {
     </div>
   );
 }
+
+const LandingLazy = React.lazy(() =>
+  import('./components/LandingPage.tsx').then(m => ({ default: m.LandingPage as React.ComponentType<any> }))
+);
