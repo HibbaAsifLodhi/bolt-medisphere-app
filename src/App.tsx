@@ -7,8 +7,7 @@ import { LazyRoute } from './components/LazyRoute.tsx';
 import { HomeDashboard } from './views/HomeDashboard.tsx';
 import { INITIAL_PATIENT, INITIAL_AUDIT_LOGS } from './data/mockData.ts';
 import { AuditLogItem, PatientData } from './types/index.ts';
-import { fetchPatient, savePatient, fetchAuditLogs, addAuditLog as persistAuditLog, supabase } from './lib/supabase.ts';
-import { AuthView } from './components/AuthView.tsx';
+import { fetchPatient, savePatient, fetchAuditLogs, addAuditLog as persistAuditLog } from './lib/supabase.ts';
 
 type Loader = () => Promise<{ default: React.ComponentType<any> }>;
 
@@ -105,22 +104,9 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(INITIAL_AUDIT_LOGS);
   const [selectedVertebra, setSelectedVertebra] = useState<string>('L4');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [session, setSession] = useState<'loading' | 'authed' | 'guest'>('loading');
-
-  // Auth gate: restore existing session, listen for changes
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ? 'authed' : 'guest');
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-      setSession(sess ? 'authed' : 'guest');
-    });
-    return () => { sub.subscription.unsubscribe(); };
-  }, []);
 
   // Load patient + audit logs from the database on first render
   useEffect(() => {
-    if (session !== 'authed') return;
     let cancelled = false;
     (async () => {
       try {
@@ -133,7 +119,7 @@ export default function App() {
       }
     })();
     return () => { cancelled = true; };
-  }, [session]);
+  }, []);
 
   // Check URL parameters for initial view or route
   useEffect(() => {
@@ -441,18 +427,6 @@ export default function App() {
         );
     }
   };
-
-  if (session === 'loading') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0b192c]">
-        <div className="w-8 h-8 border-2 border-teal-400 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (session === 'guest') {
-    return <AuthView onAuthed={() => setSession('authed')} />;
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased flex flex-col">
